@@ -178,8 +178,10 @@ class Transaccion {
             con.setNombre(sc.nextLine());
             con.setPrecio(sc.nextDouble());
             con.setCantidad(sc.nextInt());
-            System.out.println("Desea ingresar otro? 1 sigue, 0 termina transaccion");
-            otro = sc.nextInt();
+            do {
+                System.out.println("Desea ingresar otro? 1: sigue, 0: termina transaccion");
+                otro = sc.nextInt();
+            } while(otro != 0 && otro != 1);
             lista.add(con);
         }
         System.out.println("Finalizo transaccion");
