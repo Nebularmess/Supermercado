@@ -10,9 +10,9 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        Empleado E1 = new Empleado("Nico", "Soria", 41281401, 250000.00);
-        Caja C1 = new Caja (E1, 1);
-        Cliente Cl1 = new Cliente("Maxi", "Fernandez", 28526445, true);
+        Empleado E1 = new Empleado("Cosme", "Fulanito", 41281401, 250000.00);
+        Cliente Cl1 = new Cliente("El", "Barto", 28526445, true);
+        Caja C1 = new Caja (E1, 1, Cl1 );
         C1.iniciaCompra();
         C1.brindarTicket();
         }
@@ -51,39 +51,47 @@ class Humane {
 class Empleado extends Humane {
 
     private double sueldo;
-    private ArrayList<String> lista = new ArrayList<>();
-
     public Empleado(String nombre, String apellido, int dni, double sueldo) {
         super(nombre, apellido, dni);
         this.sueldo = sueldo;
-    }
-    public void cargaProductos () {
-        System.out.println("Ingrese nombre de producto");
-
-    }
-
-    public String toString() {
-        return "\n" + super.toString() + "\nSueldo: " + this.sueldo;
     }
 }
 
 class Caja {
     private Empleado empleado;
+    private Cliente cliente;
     private int nroCaja;
     Transaccion transaccion = new Transaccion();
 
-    public Caja(Empleado empleado, int nroCaja) {
+    public Caja(Empleado empleado, int nroCaja, Cliente cliente) {
         this.empleado = empleado;
         this.nroCaja = nroCaja;
+        this.cliente = cliente;
     }
     public void iniciaCompra() {
         transaccion.listaTransaccion();
     }
+    public void totalEs() {
+        System.out.println("Su total es: " +transaccion.calcularTotal() );
+    }
     public void brindarTicket() {
-        System.out.println("Detalle de su compra");
-        for (Producto producto : transaccion.getLista()) {
-            System.out.println(producto.toString());
+        System.out.println("Detalle de su compra:");
+        System.out.println(cliente.toString());
+        if (transaccion != null && transaccion.getLista() != null) {
+            if (transaccion.getLista().isEmpty()) {
+                System.out.println("No hay productos en esta transacción.");
+            } else {
+                for (Producto producto : transaccion.getLista()) {
+                    if (producto != null) {
+                        System.out.println(producto.toString());
+                    }
+                }
+            }
+        } else {
+            System.out.println("No hay información de transacción disponible.");
         }
+        totalEs();
+        System.out.println("Fue atendido por:\n" + empleado.toString() +"\nNúmero de caja " + nroCaja);
     }
 
     public String toString() {
@@ -100,16 +108,14 @@ class Cliente extends Humane {
         super(nombre, apellido, dni);
         this.mayorista = mayorista;
     }
-    public String iniciarCompra (boolean com) {
-        if (com) {
-            return "Iniciando compra en caja, cliente: "+ getNombre() + " " + getApellido();
-        } else {
-            return "No aún";
-        }
-    }
 
-    public String toString() {
-        return "\n" + super.toString() + "\nMayorista: " + this.mayorista;
+    @Override
+    public String toString () {
+        if (mayorista){
+            return "Nombre: " + getNombre() + "\nApellido: " + getApellido() + "\nDNI: " + getDni()+ "\nCliente Mayorista";
+        } else {
+            return "Nombre: " + getNombre() + "\nApellido: " + getApellido() +"\nDNI: " + getDni()+ "\nCliente Minorista";
+        }
     }
 }
 class Producto {
@@ -146,10 +152,21 @@ class Producto {
     }
 }
 class Transaccion {
-    ArrayList<Producto> lista = new ArrayList<>();
+    private ArrayList<Producto> lista = new ArrayList<>();
+    private double total;
 
     public ArrayList<Producto> getLista() {
         return lista;
+    }
+
+    public double getTotal() {
+        return total;
+    }
+    public double calcularTotal () {
+        for (Producto producto: lista) {
+            total = total + (producto.getPrecio() * producto.getCantidad());
+        }
+        return total;
     }
 
     public void listaTransaccion (){
